@@ -1,0 +1,1374 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b12">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<title>AZYRON CHAT</title>
+
+<style>
+:root {
+  --bg: #080b12;
+  --panel: #101622;
+  --panel-light: #151e2c;
+  --bubble: #171e2b;
+  --my-bubble: #203c58;
+  --border: #283448;
+  --white: #f4f7fc;
+  --muted: #9aa8bc;
+  --blue: #76baff;
+  --blue-light: #a7d5ff;
+  --silver: #d5deea;
+  --danger: #ff7777;
+  --shadow: 0 8px 28px rgba(0, 0, 0, .25);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at top, #142238 0%, transparent 48%),
+    var(--bg);
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  width: 100%;
+  max-width: 760px;
+  height: calc(100dvh - 28px);
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: rgba(8, 11, 18, .97);
+  box-shadow: var(--shadow);
+}
+
+/* HEADER */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 18px;
+  background: linear-gradient(135deg, #111b2a, #0b101a);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #526a86;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #253951, #111925);
+  color: var(--blue-light);
+  font-size: 23px;
+  font-weight: 800;
+  box-shadow: 0 0 18px rgba(118, 186, 255, .08);
+}
+
+.brand {
+  min-width: 0;
+  flex: 1;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 21px;
+  letter-spacing: 1.8px;
+  font-weight: 800;
+}
+
+.brand p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .4px;
+}
+
+.brand span {
+  color: var(--blue);
+}
+
+/* NAME SETTINGS */
+
+.name-panel {
+  padding: 13px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.name-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--silver);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+.name-row {
+  display: flex;
+  gap: 9px;
+}
+
+.name-row input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 13px;
+  color: var(--white);
+  background: #090e17;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+}
+
+input::placeholder {
+  color: #75849a;
+}
+
+input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(118, 186, 255, .08);
+}
+
+.name-row input:disabled {
+  color: var(--silver);
+  opacity: 1;
+}
+
+.action-btn {
+  flex-shrink: 0;
+  padding: 0 15px;
+  border: 1px solid #506681;
+  border-radius: 10px;
+  background: #263b53;
+  color: #f5f9ff;
+  font-weight: bold;
+  font-size: 12px;
+  transition: background .2s, transform .2s;
+}
+
+.action-btn:active,
+.send-btn:active {
+  transform: scale(.97);
+}
+
+.action-btn:hover {
+  background: #304c6b;
+}
+
+/* CHAT AREA */
+
+.chat-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 14px;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  background:
+    radial-gradient(ellipse at center, rgba(29, 46, 70, .12), transparent 70%),
+    #080b12;
+}
+
+.chat-area::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chat-area::-webkit-scrollbar-thumb {
+  background: #344156;
+  border-radius: 10px;
+}
+
+.welcome {
+  max-width: 340px;
+  margin: 26px auto;
+  padding: 22px 18px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background: linear-gradient(145deg, #111a28, #0b1019);
+  animation: fadeIn .45s ease both;
+}
+
+.welcome-icon {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.welcome h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  color: var(--silver);
+}
+
+.welcome p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0 0 15px;
+  animation: fadeIn .25s ease both;
+}
+
+.message.mine {
+  align-items: flex-end;
+}
+
+.message.enter {
+  animation: messageEnter .3s ease both;
+}
+
+.message-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 5px 6px;
+  max-width: 88%;
+}
+
+.message-name {
+  color: var(--blue-light);
+  font-size: 12px;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.message.mine .message-name {
+  color: var(--silver);
+}
+
+.message-time {
+  color: #8492a6;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.bubble {
+  max-width: 88%;
+  min-width: 50px;
+  padding: 11px 13px;
+  background: var(--bubble);
+  border: 1px solid #263246;
+  border-radius: 5px 15px 15px 15px;
+  color: #edf2fa;
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+  font-size: 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .12);
+}
+
+.mine .bubble {
+  background: linear-gradient(145deg, #23415f, #1a3048);
+  border-color: #365878;
+  border-radius: 15px 5px 15px 15px;
+}
+
+.message-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.attachment {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  max-height: 300px;
+  margin-bottom: 7px;
+  border-radius: 9px;
+  object-fit: contain;
+  background: #06090f;
+}
+
+.file-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--blue-light);
+  font-size: 12px;
+}
+
+.delete-btn {
+  margin: 5px 4px 0;
+  padding: 4px 8px;
+  color: #9aa8bc;
+  background: transparent;
+  border: 1px solid #293548;
+  border-radius: 7px;
+  font-size: 10px;
+}
+
+.delete-btn:hover {
+  color: var(--danger);
+  border-color: #824747;
+}
+
+.empty-hint {
+  text-align: center;
+  color: #7e8ba0;
+  font-size: 12px;
+  margin: 18px 0;
+}
+
+/* COMPOSER */
+
+.composer {
+  padding: 13px;
+  background: linear-gradient(180deg, #101622, #0b1019);
+  border-top: 1px solid var(--border);
+}
+
+.selected-file {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--silver);
+  background: #0a101a;
+  font-size: 12px;
+}
+
+.selected-file.show {
+  display: flex;
+}
+
+#fileName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-file {
+  padding: 4px 8px;
+  color: var(--danger);
+  border: 1px solid #56333b;
+  border-radius: 6px;
+  background: #211319;
+}
+
+.composer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attach-btn {
+  width: 43px;
+  height: 45px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #34445b;
+  border-radius: 12px;
+  background: #182335;
+  color: var(--blue-light);
+  font-size: 22px;
+}
+
+.attach-btn:hover {
+  background: #23344b;
+}
+
+#messageInput {
+  flex: 1;
+  min-width: 0;
+  height: 45px;
+  padding: 0 13px;
+  color: var(--white);
+  background: #080d15;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+}
+
+.send-btn {
+  height: 45px;
+  padding: 0 18px;
+  flex-shrink: 0;
+  border: 1px solid #a7d5ff;
+  border-radius: 12px;
+  color: #07111e;
+  background: linear-gradient(135deg, #b6ddff, #75b7f4);
+  font-weight: 800;
+  transition: transform .2s, filter .2s;
+}
+
+.send-btn:hover {
+  filter: brightness(1.08);
+}
+
+.footer-note {
+  margin: 10px 3px 0;
+  text-align: center;
+  color: #738198;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@keyframes messageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 0;
+  }
+
+  .app {
+    height: 100dvh;
+    min-height: 420px;
+    border-radius: 0;
+    border: none;
+  }
+
+  .header {
+    padding: 15px;
+  }
+
+  .brand h1 {
+    font-size: 19px;
+    letter-spacing: 1.2px;
+  }
+
+  .name-panel {
+    padding: 12px;
+  }
+
+  .chat-area {
+    padding: 15px 10px;
+  }
+
+  .composer {
+    padding: 10px;
+  }
+
+  .send-btn {
+    padding: 0 14px;
+  }
+
+  .bubble {
+    max-width: 92%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+/* AZYRON CHAT — CUSTOM DELETE POPUP */
+
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(2, 5, 12, 0.78);
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.28s ease,
+    visibility 0.28s ease,
+    backdrop-filter 0.28s ease;
+}
+
+.delete-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.delete-modal {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  padding: 27px 23px 22px;
+  overflow: hidden;
+  text-align: center;
+  background:
+    radial-gradient(
+      ellipse at top,
+      rgba(42, 70, 104, 0.30),
+      transparent 65%
+    ),
+    linear-gradient(145deg, #131d2c, #090e17 80%);
+  border: 1px solid #344861;
+  border-radius: 23px;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.65),
+    0 0 30px rgba(118, 186, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  opacity: 0;
+  transform: translateY(24px) scale(0.88);
+  transition:
+    opacity 0.3s ease,
+    transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.delete-modal-overlay.active .delete-modal {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.delete-modal-overlay.closing {
+  opacity: 0;
+  visibility: visible;
+  pointer-events: none;
+}
+
+.delete-modal-overlay.closing .delete-modal {
+  opacity: 0;
+  transform: translateY(12px) scale(0.94);
+}
+
+.delete-modal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18%;
+  width: 64%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #76baff,
+    transparent
+  );
+  box-shadow: 0 0 14px rgba(118, 186, 255, 0.5);
+}
+
+.delete-modal-icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 119, 119, 0.35);
+  border-radius: 21px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 119, 119, 0.16),
+    rgba(110, 34, 48, 0.10)
+  );
+  color: #ff858c;
+  box-shadow: 0 0 26px rgba(255, 90, 110, 0.08);
+  animation: deleteIconEnter 0.55s 0.08s both;
+}
+
+.delete-modal-icon svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.delete-modal h2 {
+  margin: 0 0 10px;
+  color: #f4f7fc;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.delete-modal p {
+  margin: 0 auto 25px;
+  max-width: 260px;
+  color: #9aa8bc;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.delete-modal p span {
+  color: #ff999e;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.delete-modal-actions button {
+  flex: 1;
+  min-width: 0;
+  min-height: 45px;
+  padding: 11px 9px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.delete-cancel {
+  color: #d5deea;
+  background: #141e2c;
+  border: 1px solid #34445a;
+}
+
+.delete-cancel:hover {
+  background: #202d40;
+  border-color: #526b89;
+}
+
+.delete-confirm {
+  color: #fff;
+  background: linear-gradient(135deg, #e75f70, #b9324c);
+  border: 1px solid #ff8490;
+  box-shadow: 0 5px 18px rgba(218, 60, 83, 0.17);
+}
+
+.delete-confirm:hover {
+  background: linear-gradient(135deg, #ff7182, #cf3a54);
+  box-shadow: 0 5px 22px rgba(218, 60, 83, 0.27);
+}
+
+.delete-modal-actions button:active {
+  transform: scale(0.96);
+}
+
+.delete-modal-kicker {
+  margin-bottom: 9px;
+  color: #76baff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.3px;
+}
+
+@keyframes deleteIconEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.65) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@media (max-width: 380px) {
+  .delete-modal {
+    padding: 24px 17px 18px;
+    border-radius: 20px;
+  }
+
+  .delete-modal-actions button {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delete-modal,
+  .delete-modal-overlay,
+  .delete-modal-icon,
+  .delete-modal-actions button {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* AZYRON CHAT — CUSTOM DELETE POPUP */
+
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(2, 5, 12, 0.78);
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.28s ease,
+    visibility 0.28s ease,
+    backdrop-filter 0.28s ease;
+}
+
+.delete-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.delete-modal {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  padding: 27px 23px 22px;
+  overflow: hidden;
+  text-align: center;
+  background:
+    radial-gradient(
+      ellipse at top,
+      rgba(42, 70, 104, 0.30),
+      transparent 65%
+    ),
+    linear-gradient(145deg, #131d2c, #090e17 80%);
+  border: 1px solid #344861;
+  border-radius: 23px;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.65),
+    0 0 30px rgba(118, 186, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  opacity: 0;
+  transform: translateY(24px) scale(0.88);
+  transition:
+    opacity 0.3s ease,
+    transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.delete-modal-overlay.active .delete-modal {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.delete-modal-overlay.closing {
+  opacity: 0;
+  visibility: visible;
+  pointer-events: none;
+}
+
+.delete-modal-overlay.closing .delete-modal {
+  opacity: 0;
+  transform: translateY(12px) scale(0.94);
+}
+
+.delete-modal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18%;
+  width: 64%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #76baff,
+    transparent
+  );
+  box-shadow: 0 0 14px rgba(118, 186, 255, 0.5);
+}
+
+.delete-modal-icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 119, 119, 0.35);
+  border-radius: 21px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 119, 119, 0.16),
+    rgba(110, 34, 48, 0.10)
+  );
+  color: #ff858c;
+  box-shadow: 0 0 26px rgba(255, 90, 110, 0.08);
+  animation: deleteIconEnter 0.55s 0.08s both;
+}
+
+.delete-modal-icon svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.delete-modal h2 {
+  margin: 0 0 10px;
+  color: #f4f7fc;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.delete-modal p {
+  margin: 0 auto 25px;
+  max-width: 260px;
+  color: #9aa8bc;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.delete-modal p span {
+  color: #ff999e;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.delete-modal-actions button {
+  flex: 1;
+  min-width: 0;
+  min-height: 45px;
+  padding: 11px 9px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.delete-cancel {
+  color: #d5deea;
+  background: #141e2c;
+  border: 1px solid #34445a;
+}
+
+.delete-cancel:hover {
+  background: #202d40;
+  border-color: #526b89;
+}
+
+.delete-confirm {
+  color: #fff;
+  background: linear-gradient(135deg, #e75f70, #b9324c);
+  border: 1px solid #ff8490;
+  box-shadow: 0 5px 18px rgba(218, 60, 83, 0.17);
+}
+
+.delete-confirm:hover {
+  background: linear-gradient(135deg, #ff7182, #cf3a54);
+  box-shadow: 0 5px 22px rgba(218, 60, 83, 0.27);
+}
+
+.delete-modal-actions button:active {
+  transform: scale(0.96);
+}
+
+.delete-modal-kicker {
+  margin-bottom: 9px;
+  color: #76baff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.3px;
+}
+
+@keyframes deleteIconEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.65) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@media (max-width: 380px) {
+  .delete-modal {
+    padding: 24px 17px 18px;
+    border-radius: 20px;
+  }
+
+  .delete-modal-actions button {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delete-modal,
+  .delete-modal-overlay,
+  .delete-modal-icon,
+  .delete-modal-actions button {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="logo">A</div>
+    <div class="brand">
+      <h1>AZYRON CHAT</h1>
+      <p>PRIVATE SPACE <span>•</span> YOUR CONVERSATIONS</p>
+    </div>
+  </header>
+
+  <section class="name-panel">
+    <label class="name-label" for="nameInput">Your display name</label>
+    <div class="name-row">
+      <input
+        id="nameInput"
+        type="text"
+        maxlength="30"
+        placeholder="Enter your name..."
+        autocomplete="nickname"
+      >
+      <button id="nameBtn" class="action-btn" type="button">
+        Save Name
+      </button>
+    </div>
+  </section>
+
+  <main id="chatArea" class="chat-area" aria-live="polite">
+    <div id="welcome" class="welcome">
+      <div class="welcome-icon">✦</div>
+      <h2>Welcome to AZYRON CHAT</h2>
+      <p>A clean, modern space for your messages. Save your name and start chatting.</p>
+    </div>
+    <div id="messages"></div>
+  </main>
+
+  <form id="composer" class="composer">
+    <div id="selectedFile" class="selected-file">
+      <span>📎</span>
+      <span id="fileName"></span>
+      <button class="remove-file" id="removeFile" type="button">Remove</button>
+    </div>
+
+    <div class="composer-row">
+      <button
+        class="attach-btn"
+        id="attachBtn"
+        type="button"
+        aria-label="Attach an image or video"
+        title="Attach image or video"
+      >＋</button>
+
+      <input
+        id="fileInput"
+        type="file"
+        accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm"
+        hidden
+      >
+
+      <input
+        id="messageInput"
+        type="text"
+        maxlength="2000"
+        placeholder="Write a message..."
+        autocomplete="off"
+      >
+
+      <button class="send-btn" type="submit">Send ➤</button>
+    </div>
+
+    <p class="footer-note">
+      AZYRON CHAT · Designed for a cleaner conversation experience
+    </p>
+  </form>
+
+</div>
+
+<script>
+"use strict";
+
+const NAME_KEY = "azyron_chat_name_v1";
+const MESSAGE_KEY = "azyron_chat_messages_v1";
+const MAX_MESSAGES = 300;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+const nameInput = document.getElementById("nameInput");
+const nameBtn = document.getElementById("nameBtn");
+const chatArea = document.getElementById("chatArea");
+const messagesEl = document.getElementById("messages");
+const welcome = document.getElementById("welcome");
+const composer = document.getElementById("composer");
+const messageInput = document.getElementById("messageInput");
+const fileInput = document.getElementById("fileInput");
+const attachBtn = document.getElementById("attachBtn");
+const selectedFile = document.getElementById("selectedFile");
+const fileName = document.getElementById("fileName");
+const removeFileBtn = document.getElementById("removeFile");
+
+let savedName = "";
+let pendingFile = null;
+let messages = [];
+let latestObjectUrl = null;
+
+function loadMessages() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(MESSAGE_KEY) || "[]");
+    if (Array.isArray(stored)) {
+      messages = stored
+        .filter(m =>
+          m &&
+          typeof m.id === "string" &&
+          typeof m.text === "string" &&
+          typeof m.time === "number" &&
+          typeof m.mine === "boolean"
+        )
+        .slice(-MAX_MESSAGES);
+    }
+  } catch (error) {
+    messages = [];
+  }
+}
+
+function loadName() {
+  try {
+    savedName = (localStorage.getItem(NAME_KEY) || "").trim().slice(0, 30);
+  } catch (error) {
+    savedName = "";
+  }
+
+  nameInput.value = savedName;
+  updateNameLock();
+}
+
+function updateNameLock() {
+  const locked = savedName.length > 0;
+  nameInput.disabled = locked;
+  nameBtn.textContent = locked ? "Change Name" : "Save Name";
+}
+
+nameBtn.addEventListener("click", function () {
+  if (savedName) {
+    savedName = "";
+    nameInput.disabled = false;
+    nameInput.value = "";
+    nameBtn.textContent = "Save Name";
+    nameInput.focus();
+    return;
+  }
+
+  const candidate = nameInput.value.trim().slice(0, 30);
+
+  if (!candidate) {
+    alert("Please enter your name first.");
+    nameInput.focus();
+    return;
+  }
+
+  savedName = candidate;
+
+  try {
+    localStorage.setItem(NAME_KEY, savedName);
+  } catch (error) {
+    alert("Your browser could not save the name. Check storage settings.");
+    savedName = "";
+    updateNameLock();
+    return;
+  }
+
+  updateNameLock();
+  nameInput.value = savedName;
+  messageInput.focus();
+  render();
+});
+
+nameInput.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    nameBtn.click();
+  }
+});
+
+function saveMessages() {
+  try {
+    localStorage.setItem(
+      MESSAGE_KEY,
+      JSON.stringify(messages.slice(-MAX_MESSAGES))
+    );
+  } catch (error) {
+    alert("Storage is full. Try deleting some messages or using smaller files.");
+  }
+}
+
+function formatTime(timestamp) {
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  });
+}
+
+function showName(message) {
+  return message.mine ? (savedName || message.name || "You") :
+    (message.name || "Guest");
+}
+
+function render(animateLatest = false) {
+  messagesEl.replaceChildren();
+  welcome.style.display = messages.length ? "none" : "block";
+
+  messages.forEach(function (message, index) {
+    const wrap = document.createElement("div");
+    wrap.className = "message" + (message.mine ? " mine" : "");
+
+    if (animateLatest && index === messages.length - 1) {
+      wrap.classList.add("enter");
+    }
+
+    const head = document.createElement("div");
+    head.className = "message-head";
+
+    const sender = document.createElement("span");
+    sender.className = "message-name";
+    sender.textContent = showName(message);
+
+    const time = document.createElement("span");
+    time.className = "message-time";
+    time.textContent = formatTime(message.time);
+
+    head.append(sender, time);
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+
+    if (message.fileData && message.fileType) {
+      if (message.fileType.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.className = "attachment";
+        img.src = message.fileData;
+        img.alt = "Attached image";
+        img.loading = "lazy";
+        bubble.appendChild(img);
+      } else if (message.fileType.startsWith("video/")) {
+        const video = document.createElement("video");
+        video.className = "attachment";
+        video.src = message.fileData;
+        video.controls = true;
+        video.preload = "metadata";
+        bubble.appendChild(video);
+      }
+    }
+
+    if (message.fileName) {
+      const fileLabel = document.createElement("span");
+      fileLabel.className = "file-label";
+      fileLabel.textContent = "📎 " + message.fileName;
+      bubble.appendChild(fileLabel);
+    }
+
+    if (message.text) {
+      const text = document.createElement("div");
+      text.className = "message-text";
+      text.textContent = message.text;
+      bubble.appendChild(text);
+    }
+
+    wrap.append(head, bubble);
+
+    if (message.mine) {
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "delete-btn";
+      deleteBtn.textContent = "Delete message";
+      deleteBtn.addEventListener("click", function () {
+        if (!confirm("Delete this message?")) return;
+
+        messages = messages.filter(item => item.id !== message.id);
+        saveMessages();
+        render();
+      });
+      wrap.appendChild(deleteBtn);
+    }
+
+    messagesEl.appendChild(wrap);
+  });
+
+  if (animateLatest) {
+    requestAnimationFrame(function () {
+      chatArea.scrollTop = chatArea.scrollHeight;
+    });
+  }
+}
+
+function clearPendingFile() {
+  pendingFile = null;
+  fileInput.value = "";
+  selectedFile.classList.remove("show");
+  fileName.textContent = "";
+}
+
+attachBtn.addEventListener("click", function () {
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", function () {
+  const file = fileInput.files && fileInput.files[0];
+  if (!file) return;
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "video/mp4",
+    "video/webm"
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    alert("Please select a JPG, PNG, GIF, WEBP, MP4, or WEBM file.");
+    clearPendingFile();
+    return;
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    alert("The maximum attachment size is 10 MB.");
+    clearPendingFile();
+    return;
+  }
+
+  pendingFile = file;
+  fileName.textContent = file.name;
+  selectedFile.classList.add("show");
+});
+
+removeFileBtn.addEventListener("click", clearPendingFile);
+
+composer.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  if (!savedName) {
+    alert("Please save your display name before sending messages.");
+    nameInput.disabled = false;
+    nameInput.focus();
+    return;
+  }
+
+  const text = messageInput.value.trim();
+  const file = pendingFile;
+
+  if (!text && !file) {
+    messageInput.focus();
+    return;
+  }
+
+  let fileData = "";
+  let fileType = "";
+  let attachedName = "";
+
+  if (file) {
+    try {
+      fileData = await readFileAsDataURL(file);
+      fileType = file.type;
+      attachedName = file.name;
+    } catch (error) {
+      alert("Unable to read this attachment.");
+      return;
+    }
+  }
+
+  const message = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 9),
+    name: savedName,
+    mine: true,
+    text: text,
+    time: Date.now(),
+    fileData: fileData,
+    fileType: fileType,
+    fileName: attachedName
+  };
+
+  messages.push(message);
+
+  if (messages.length > MAX_MESSAGES) {
+    messages = messages.slice(-MAX_MESSAGES);
+  }
+
+  saveMessages();
+  messageInput.value = "";
+  clearPendingFile();
+  render(true);
+  messageInput.focus();
+});
+
+function readFileAsDataURL(file) {
+  return new Promise(function (resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      resolve(String(reader.result || ""));
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+loadName();
+loadMessages();
+render();
+</script>
+</body>
+</html>
